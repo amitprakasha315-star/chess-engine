@@ -390,7 +390,7 @@ function getBestMove() {
         game.move(move);
 
         let score = alphaBeta(
-            3,
+            2,
             -Infinity,
             Infinity,
             true
