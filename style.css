@@ -1,0 +1,46 @@
+body{
+    margin:0;
+    min-height:100vh;
+    background:#222;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.container{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:20px;
+}
+
+#myBoard{
+    width:600px;
+    max-width:95vw;
+}
+
+#historyPanel{
+    width:600px;
+    max-width:95vw;
+
+    background:#333;
+    color:white;
+
+    padding:15px;
+    border-radius:12px;
+
+    box-sizing:border-box;
+}
+
+.history-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.history-table th,
+.history-table td{
+    border:1px solid #555;
+    padding:8px;
+    text-align:center;
+}
