@@ -287,7 +287,7 @@ function highlightCheckmate() {
 function removeHighlights() {
 
     $('#myBoard .square-55d63').removeClass(
-        'highlight-white highlight-black highlight-move highlight-check highlight-checkmate'
+        'highlight-white highlight-black highlight-move highlight-capture highlight-check highlight-checkmate'
     );
 }
 
@@ -319,7 +319,14 @@ function showLegalMoves(square) {
 
         let squareEl = $('#myBoard .square-' + move.to);
 
-        squareEl.addClass('highlight-move');
+        // अगर इस square पर move करने से कोई piece कट रहा है
+        // (en passant भी capture गिना जाएगा)
+        if (move.captured || move.flags.indexOf('e') !== -1) {
+            squareEl.addClass('highlight-capture');
+        }
+        else {
+            squareEl.addClass('highlight-move');
+        }
     }
 }
 
