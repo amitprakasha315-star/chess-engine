@@ -249,6 +249,87 @@ body {
    HIGHLIGHT STYLES
    ========================== */
 
+/* ==========================
+   RESPONSIVE / MOBILE
+   ========================== */
+
+@media (max-width: 700px) {
+
+    .screen {
+        padding: 12px;
+        align-items: flex-start;
+    }
+
+    .menu-box {
+        width: 100%;
+        padding: 24px 18px;
+    }
+
+    .game-wrapper {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        width: 100%;
+    }
+
+    #myBoard {
+        width: 100%;
+        max-width: 440px;
+    }
+
+    #sidePanel {
+        width: 100%;
+        max-width: 440px;
+    }
+
+    .side-buttons button {
+        padding: 14px;
+        font-size: 16px;
+    }
+
+    .menu-btn {
+        padding: 16px;
+        font-size: 17px;
+    }
+
+    .modal-box {
+        width: 90vw;
+        padding: 22px 16px;
+    }
+
+    .promo-btn,
+    .gameover-buttons button {
+        padding: 14px;
+        font-size: 16px;
+    }
+
+    #historyPanel {
+        max-height: 200px;
+    }
+
+    .history-table th,
+    .history-table td {
+        padding: 4px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 380px) {
+
+    #myBoard {
+        max-width: 92vw;
+    }
+
+    #sidePanel {
+        max-width: 92vw;
+    }
+
+    .menu-box h1 {
+        font-size: 26px;
+    }
+}
+
+
 .highlight-white {
     background-color: rgba(255, 255, 0, 0.5) !important;
 }
