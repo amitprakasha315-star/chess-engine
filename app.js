@@ -93,36 +93,123 @@ const rookTable = [
     [0, 0, 5, 10, 10, 5, 0, 0]
 ];
 
+const queenTable = [
+    [-20, -10, -10, -5, -5, -10, -10, -20],
+    [-10, 0, 0, 0, 0, 0, 0, -10],
+    [-10, 0, 5, 5, 5, 5, 0, -10],
+    [-5, 0, 5, 5, 5, 5, 0, -5],
+    [0, 0, 5, 5, 5, 5, 0, -5],
+    [-10, 5, 5, 5, 5, 5, 0, -10],
+    [-10, 0, 5, 0, 0, 0, 0, -10],
+    [-20, -10, -10, -5, -5, -10, -10, -20]
+];
+
+const kingOpeningTable = [
+    [20, 30, 10, 0, 0, 10, 30, 20],
+    [20, 20, 10, 0, 0, 10, 20, 20],
+    [0, 0, 0, -10, -10, 0, 0, 0],
+    [-10, -20, -20, -30, -30, -20, -20, -10],
+    [-20, -30, -30, -40, -40, -30, -30, -20],
+    [-30, -40, -40, -50, -50, -40, -40, -30],
+    [-30, -40, -40, -50, -50, -40, -40, -30],
+    [-30, -40, -40, -50, -50, -40, -40, -30]
+];
+
+const kingEndgameTable = [
+    [-50, -40, -30, -20, -20, -30, -40, -50],
+    [-30, -20, -10, 0, 0, -10, -20, -30],
+    [-30, -10, 20, 30, 30, 20, -10, -30],
+    [-30, -10, 30, 40, 40, 30, -10, -30],
+    [-30, -10, 30, 40, 40, 30, -10, -30],
+    [-30, -10, 20, 30, 30, 20, -10, -30],
+    [-30, -30, 0, 0, 0, 0, -30, -30],
+    [-50, -30, -30, -30, -30, -30, -30, -50]
+];
+
 var game = new Chess();
 var board = null;
+var selectedSquare = null;
+
+// ==========================
+// BOARD CONFIG (drag removed,
+// pure click / tap based movement)
+// ==========================
 
 var config = {
-    draggable: true,
+    draggable: false,
     position: 'start',
 
     pieceTheme:
-        'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
-
-    onDrop: onDrop,
-    onSnapEnd: onSnapEnd
+        'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
 };
 
 board = Chessboard('myBoard', config);
 
-function onDrop(source, target) {
+// ==========================
+// CLICK / TAP TO MOVE
+// ==========================
 
-    var move = game.move({
-        from: source,
-        to: target,
+$('#myBoard').on('click touchend', '.square-55d63', function (e) {
+
+    e.preventDefault();
+
+    handleSquareClick($(this).attr('data-square'));
+});
+
+function handleSquareClick(square) {
+
+    // AI की turn में या game खत्म होने पर click ignore करो
+    if (game.game_over()) {
+        return;
+    }
+
+    let piece = game.get(square);
+
+    // Case 1: कोई square पहले से selected नहीं है
+    if (!selectedSquare) {
+
+        if (piece && piece.color === game.turn()) {
+            selectedSquare = square;
+            highlightSquare(square);
+            showLegalMoves(square);
+        }
+        return;
+    }
+
+    // Case 2: same square दोबारा click -> deselect
+    if (selectedSquare === square) {
+        selectedSquare = null;
+        removeHighlights();
+        return;
+    }
+
+    // Case 3: move करने की कोशिश करो
+    let move = game.move({
+        from: selectedSquare,
+        to: square,
         promotion: 'q'
     });
 
+    selectedSquare = null;
+    removeHighlights();
+
     if (move === null) {
-        return 'snapback';
+
+        // Invalid move था, लेकिन apna hi dusra piece click kiya -> select it
+        if (piece && piece.color === game.turn()) {
+            selectedSquare = square;
+            highlightSquare(square);
+            showLegalMoves(square);
+        }
+        return;
     }
+
+    board.position(game.fen());
     updateMoveHistory();
+    highlightCheck();
 
     if (game.in_checkmate()) {
+        highlightCheckmate();
         alert("Checkmate!");
         return;
     }
@@ -131,16 +218,187 @@ function onDrop(source, target) {
         alert("Draw!");
         return;
     }
+
     setTimeout(makeBestMove, 250);
 }
 
-function onSnapEnd() {
-    board.position(game.fen());
+function highlightCheck() {
+
+    removeHighlights();
+
+    if (!game.in_check()) return;
+
+    let boardArray = game.board();
+
+    for (let r = 0; r < 8; r++) {
+
+        for (let c = 0; c < 8; c++) {
+
+            let piece = boardArray[r][c];
+
+            if (
+                piece &&
+                piece.type === 'k' &&
+                piece.color === game.turn()
+            ) {
+
+                let square =
+                    "abcdefgh"[c] + (8 - r);
+
+                $('#myBoard .square-' + square)
+                    .addClass('highlight-check');
+
+                return;
+            }
+        }
+    }
+}
+
+function highlightCheckmate() {
+
+    removeHighlights();
+
+    let boardArray = game.board();
+
+    for (let r = 0; r < 8; r++) {
+
+        for (let c = 0; c < 8; c++) {
+
+            let piece = boardArray[r][c];
+
+            if (
+                piece &&
+                piece.type === 'k' &&
+                piece.color === game.turn()
+            ) {
+
+                let square =
+                    "abcdefgh"[c] + (8 - r);
+
+                $('#myBoard .square-' + square)
+                    .addClass('highlight-checkmate');
+
+                return;
+            }
+        }
+    }
+}
+
+function removeHighlights() {
+
+    $('#myBoard .square-55d63').removeClass(
+        'highlight-white highlight-black highlight-move highlight-check highlight-checkmate'
+    );
+}
+
+function highlightSquare(square) {
+
+    let squareEl = $('#myBoard .square-' + square);
+
+    if (squareEl.hasClass('black-3c85d')) {
+        squareEl.addClass('highlight-black');
+    }
+    else {
+        squareEl.addClass('highlight-white');
+    }
+}
+
+function showLegalMoves(square) {
+
+    let moves = game.moves({
+        square: square,
+        verbose: true
+    });
+
+    if (moves.length === 0)
+        return;
+
+    highlightSquare(square);
+
+    for (let move of moves) {
+
+        let squareEl = $('#myBoard .square-' + move.to);
+
+        squareEl.addClass('highlight-move');
+    }
 }
 
 // ==========================
 // EVALUATION FUNCTION
 // ==========================
+
+function isEndgame() {
+
+    let material = 0;
+
+    let boardArray = game.board();
+
+    for (let row = 0; row < 8; row++) {
+
+        for (let col = 0; col < 8; col++) {
+
+            let piece = boardArray[row][col];
+
+            if (piece && piece.type !== 'k') {
+
+                switch (piece.type) {
+
+                    case 'q':
+                        material += 900;
+                        break;
+
+                    case 'r':
+                        material += 500;
+                        break;
+
+                    case 'b':
+                        material += 330;
+                        break;
+
+                    case 'n':
+                        material += 320;
+                        break;
+
+                    case 'p':
+                        material += 100;
+                        break;
+                }
+            }
+        }
+    }
+
+    return material <= 2600;
+}
+
+function isPassedPawn(boardArray, row, col, color) {
+
+    let direction = (color === 'w') ? -1 : 1;
+
+    for (let c = col - 1; c <= col + 1; c++) {
+
+        if (c < 0 || c > 7) continue;
+
+        let r = row + direction;
+
+        while (r >= 0 && r < 8) {
+
+            let piece = boardArray[r][c];
+
+            if (
+                piece &&
+                piece.type === 'p' &&
+                piece.color !== color
+            ) {
+                return false;
+            }
+
+            r += direction;
+        }
+    }
+
+    return true;
+}
+
 
 function evaluateBoard() {
 
@@ -166,6 +424,9 @@ function evaluateBoard() {
     };
 
     let score = 0;
+    const endgame = isEndgame();
+    let whiteBishops = 0;
+    let blackBishops = 0;
 
     for (let row = 0; row < 8; row++) {
 
@@ -174,6 +435,16 @@ function evaluateBoard() {
             let piece = boardArray[row][col];
 
             if (piece !== null) {
+
+                if (piece.type === 'b') {
+
+                    if (piece.color === 'w') {
+                        whiteBishops++;
+                    }
+                    else {
+                        blackBishops++;
+                    }
+                }
 
                 let value = pieceValues[piece.type];
 
@@ -209,23 +480,50 @@ function evaluateBoard() {
                     }
                 }
 
-                // King Safety
+
+                // Passed Pawn Bonus
+
+                if (piece.type === 'p') {
+
+                    if (isPassedPawn(boardArray, row, col, piece.color)) {
+
+                        if (piece.color === 'w') {
+
+                            value += (6 - row) * 20;
+
+                        } else {
+
+                            value += (row - 1) * 20;
+                        }
+                    }
+                }
+
+
+                // King PST
 
                 if (piece.type === 'k') {
 
-                    if (piece.color === 'w') {
+                    if (endgame) {
 
-                        if (row > 1 && col > 1 && col < 6) {
-                            value += 30;
+                        if (piece.color === 'w') {
+                            value += kingEndgameTable[row][col];
+                        }
+                        else {
+                            value += kingEndgameTable[7 - row][col];
                         }
 
                     } else {
 
-                        if (row < 6 && col > 1 && col < 6) {
-                            value += 30;
+                        if (piece.color === 'w') {
+                            value += kingOpeningTable[row][col];
+                        }
+                        else {
+                            value += kingOpeningTable[7 - row][col];
                         }
                     }
                 }
+
+
                 //rook
                 if (piece.type === 'r') {
 
@@ -234,6 +532,17 @@ function evaluateBoard() {
                     }
                     else {
                         value += rookTable[7 - row][col];
+                    }
+                }
+
+                // Queen PST
+                if (piece.type === 'q') {
+
+                    if (piece.color === 'w') {
+                        value += queenTable[row][col];
+                    }
+                    else {
+                        value += queenTable[7 - row][col];
                     }
                 }
 
@@ -255,6 +564,17 @@ function evaluateBoard() {
     // else {
     //     score -= mobility;
     // }
+
+
+    // Bishop Pair Bonus
+
+    if (whiteBishops >= 2) {
+        score += 30;
+    }
+
+    if (blackBishops >= 2) {
+        score -= 30;
+    }
     return score;
 }
 
@@ -425,8 +745,11 @@ function makeBestMove() {
     board.position(game.fen());
 
     updateMoveHistory();
+    highlightCheck();
+
 
     if (game.in_checkmate()) {
+        highlightCheckmate();
         alert("Checkmate!");
         return;
     }
@@ -435,4 +758,6 @@ function makeBestMove() {
         alert("Draw!");
         return;
     }
+
+
 }
