@@ -1,65 +1,262 @@
-body{
-    margin:0;
-    min-height:100vh;
-    background:#222;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
+* {
+    box-sizing: border-box;
 }
 
-.container{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:20px;
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: #222;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: white;
 }
 
-#myBoard{
-    width:600px;
-    max-width:95vw;
+.hidden {
+    display: none !important;
 }
 
-#historyPanel{
-    width:600px;
-    max-width:95vw;
-
-    background:#333;
-    color:white;
-
-    padding:15px;
-    border-radius:12px;
-
-    box-sizing:border-box;
+.screen {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
 }
 
-.history-table{
-    width:100%;
-    border-collapse:collapse;
+/* ==========================
+   MENU SCREEN
+   ========================== */
+
+.menu-box {
+    background: #2c2c2c;
+    border-radius: 16px;
+    padding: 32px 28px;
+    width: 320px;
+    max-width: 90vw;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.menu-box h1 {
+    margin: 0 0 24px 0;
+    font-size: 32px;
+}
+
+.menu-label {
+    font-size: 15px;
+    color: #aaa;
+    margin-bottom: 16px;
+}
+
+.menu-step {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.menu-btn {
+    background: #3a3a3a;
+    color: white;
+    border: 1px solid #4d4d4d;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.menu-btn:hover {
+    background: #4a7dfc;
+    border-color: #4a7dfc;
+}
+
+.menu-btn.back-btn {
+    background: transparent;
+    border: none;
+    color: #999;
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+.menu-btn.back-btn:hover {
+    color: white;
+    background: transparent;
+}
+
+.menu-btn.start-btn {
+    background: #2e9b4f;
+    border-color: #2e9b4f;
+}
+
+.menu-btn.start-btn:hover {
+    background: #38b860;
+}
+
+/* ==========================
+   GAME SCREEN
+   ========================== */
+
+.game-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 24px;
+}
+
+#myBoard {
+    width: 420px;
+    max-width: 90vw;
+}
+
+#sidePanel {
+    width: 260px;
+    max-width: 90vw;
+    background: #2c2c2c;
+    border-radius: 14px;
+    padding: 18px;
+}
+
+#sidePanel h2 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+}
+
+#modeInfo,
+#turnInfo {
+    font-size: 14px;
+    color: #bbb;
+    margin: 4px 0;
+}
+
+.side-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.side-buttons button {
+    background: #3a3a3a;
+    color: white;
+    border: 1px solid #4d4d4d;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.side-buttons button:hover {
+    background: #4a7dfc;
+    border-color: #4a7dfc;
+}
+
+#historyPanel {
+    margin-top: 16px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: #1e1e1e;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .history-table th,
-.history-table td{
-    border:1px solid #555;
-    padding:8px;
-    text-align:center;
+.history-table td {
+    border: 1px solid #444;
+    padding: 6px;
+    text-align: center;
+    font-size: 13px;
+}
+
+/* ==========================
+   MODALS
+   ========================== */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-box {
+    background: #2c2c2c;
+    border-radius: 14px;
+    padding: 26px 22px;
+    width: 300px;
+    max-width: 90vw;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.modal-box h3 {
+    margin-top: 0;
+}
+
+.promo-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.promo-btn {
+    background: #3a3a3a;
+    color: white;
+    border: 1px solid #4d4d4d;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.promo-btn:hover {
+    background: #4a7dfc;
+    border-color: #4a7dfc;
+}
+
+.gameover-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.gameover-buttons button {
+    background: #3a3a3a;
+    color: white;
+    border: 1px solid #4d4d4d;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.gameover-buttons button:hover {
+    background: #4a7dfc;
+    border-color: #4a7dfc;
 }
 
 /* ==========================
    HIGHLIGHT STYLES
    ========================== */
 
-/* Selected piece's square (light) */
 .highlight-white {
     background-color: rgba(255, 255, 0, 0.5) !important;
 }
 
-/* Selected piece's square (dark) */
 .highlight-black {
     background-color: rgba(200, 200, 0, 0.5) !important;
 }
 
-/* Legal move destination squares */
 .highlight-move {
     background-image: radial-gradient(
         circle,
@@ -70,19 +267,16 @@ body{
     background-repeat: no-repeat;
 }
 
-/* Squares where an enemy piece can be captured */
 .highlight-capture {
     box-shadow: inset 0 0 0 4px rgba(255, 0, 0, 0.85);
     background-color: rgba(255, 0, 0, 0.18) !important;
 }
 
-/* King in check */
 .highlight-check {
     box-shadow: inset 0 0 12px 6px rgba(255, 165, 0, 0.85);
     background-color: rgba(255, 165, 0, 0.35) !important;
 }
 
-/* King in checkmate */
 .highlight-checkmate {
     box-shadow: inset 0 0 14px 6px rgba(255, 0, 0, 0.9);
     background-color: rgba(255, 0, 0, 0.55) !important;
